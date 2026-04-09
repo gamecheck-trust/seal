@@ -12,7 +12,7 @@
     let allowedDomainsSet = null;
     let domainRanges = null;
     const sealDataPromise = fetch(
-      `https://gawetyk7890.com/json/${sealId}.json`
+      `https://qa.gawetyk7890.com/json/${sealId}.json?v=${Date.now()}`
     )
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -68,7 +68,7 @@
 
         const imageUUID = sealData.imageUUID || sealId;
         const clickUUID = sealData.clickUUID || sealId;
-        const clickDomain = sealData.clickDomain || "gamecheck.tech";
+        const clickDomain = sealData.clickDomain || "qa.gamecheck.tech";
         const containerId = sealData.containerId || "trust-seal-container";
 
         const sealContainer = document.getElementById(containerId);
@@ -78,7 +78,7 @@
         if (document.getElementById(anchorId)) return;
 
         const sealHref = `https://${clickDomain}/seal-scan/${clickUUID}`;
-        const imageUrl = `https://gawetyk7890.com/seal/${imageUUID}.png`;
+        const imageUrl = `https://qa.gawetyk7890.com/seal/${imageUUID}.png`;
         const width = sealData.width || 217.75;
         const height = sealData.height || 64;
 
