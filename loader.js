@@ -37,7 +37,8 @@
       try {
         if (!sealData || !allowedDomainsSet) return;
 
-        const hostname = window.location.hostname;
+        let hostname = window.location.hostname.toLowerCase();
+        hostname = hostname.replace(/^www\./, "");
         const hostnameParts = hostname.split(".");
         const domain = hostnameParts.slice(-2).join(".");
         const secondLevelDomain = hostnameParts.slice(-3).join(".");
