@@ -1,8 +1,7 @@
 (function () {
   try {
     const scriptEl =
-      document.currentScript ||
-      document.querySelector("script[data-gcs-id]");
+      document.currentScript || document.querySelector("script[data-gcs-id]");
     if (!scriptEl) return;
 
     const sealId = scriptEl.getAttribute("data-gcs-id");
@@ -10,9 +9,8 @@
 
     let sealData = null;
     let allowedDomainsSet = null;
-    let domainRanges = null;
     const sealDataPromise = fetch(
-      `https://gawetyk7890.com/json/${sealId}.json`
+      `https://gawetyk7890.com/json/${sealId}.json?${Date.now()}`,
     )
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -20,8 +18,20 @@
       })
       .then((json) => {
         sealData = json;
-        allowedDomainsSet = new Set(json.allowedDomains || []);
-        domainRanges = json.ranges || [];
+        const domains = [...(json.allowedDomains || [])];
+
+        // Expand range templates into explicit domain entries
+        for (const r of json.ranges || []) {
+          if (!r.template) continue;
+          const count = r.end - r.start + 1;
+          domains.push(
+            ...Array.from({ length: count }, (_, i) =>
+              r.template.replace("{n}", r.start + i),
+            ),
+          );
+        }
+
+        allowedDomainsSet = new Set(domains);
         runInit();
         return json;
       })
@@ -37,35 +47,13 @@
       try {
         if (!sealData || !allowedDomainsSet) return;
 
-        let hostname = window.location.hostname.toLowerCase();
-        hostname = hostname.replace(/^www\./, "");
+        const hostname = window.location.hostname;
         const hostnameParts = hostname.split(".");
         const domain = hostnameParts.slice(-2).join(".");
         const secondLevelDomain = hostnameParts.slice(-3).join(".");
 
-        const exactMatch =
-          allowedDomainsSet.has(domain) ||
-          allowedDomainsSet.has(secondLevelDomain);
-
-        const rangeMatch =
-          domainRanges.length > 0 &&
-          allowedDomainsSet.size > 0 &&
-          (() => {
-            const numMatch = hostname.match(/(\d+)/);
-            if (!numMatch) return false;
-            const num = parseInt(numMatch[1], 10);
-            const baseDomain = hostname.replace(/\d+/, "");
-            if (
-              !allowedDomainsSet.has(baseDomain) &&
-              !allowedDomainsSet.has(baseDomain.replace(/^\./, ""))
-            )
-              return false;
-            return domainRanges.some(
-              (r) => num >= r.start && num <= r.end
-            );
-          })();
-
-        if (!exactMatch && !rangeMatch) return;
+        if (![domain, secondLevelDomain].some((d) => allowedDomainsSet.has(d)))
+          return;
 
         const imageUUID = sealData.imageUUID || sealId;
         const clickUUID = sealData.clickUUID || sealId;
@@ -80,6 +68,7 @@
 
         const sealHref = `https://${clickDomain}/seal-scan/${clickUUID}`;
         const imageUrl = `https://gawetyk7890.com/seal/${imageUUID}.png`;
+        console.log("sealHref:", sealHref, "imageUrl:", imageUrl);
         const width = sealData.width || 217.75;
         const height = sealData.height || 64;
 
@@ -113,7 +102,6 @@
     }
 
     runInit();
-
 
     function observeUrlChanges(callback) {
       let oldHref = location.href;
