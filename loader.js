@@ -10,7 +10,7 @@
     let sealData = null;
     let allowedDomainsSet = null;
     const sealDataPromise = fetch(
-      `https://gawetyk7890.com/json/${sealId}.json?${Date.now()}`,
+      `https://gaaf2.com/json/${sealId}.json?${Date.now()}`,
     )
       .then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -67,7 +67,7 @@
         if (document.getElementById(anchorId)) return;
 
         const sealHref = `https://${clickDomain}/seal-scan/${clickUUID}`;
-        const imageUrl = `https://gawetyk7890.com/seal/${imageUUID}.png`;
+        const imageUrl = `https://gaaf2.com/seal/${imageUUID}.png`;
         console.log("sealHref:", sealHref, "imageUrl:", imageUrl);
         const width = sealData.width || 217.75;
         const height = sealData.height || 64;
