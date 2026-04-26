@@ -57,7 +57,7 @@
 
         const imageUUID = sealData.imageUUID || sealId;
         const clickUUID = sealData.clickUUID || sealId;
-        const clickDomain = sealData.clickDomain || "gamecheck.tech";
+        const clickDomain = sealData.clickDomain || "gamecheck1.com";
         const containerId = sealData.containerId || "trust-seal-container";
 
         const sealContainer = document.getElementById(containerId);
